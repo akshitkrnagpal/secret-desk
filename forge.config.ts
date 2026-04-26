@@ -8,6 +8,7 @@ import { PublisherGithub } from '@electron-forge/publisher-github';
 const config: ForgeConfig = {
   packagerConfig: {
     asar: true,
+    appBundleId: 'io.akshit.secretdesk',
     icon: 'assets/icon',
     extraResource: ['assets/icon.png'],
     osxSign: {

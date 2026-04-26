@@ -1,4 +1,3 @@
-import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
 
 interface AddRowButtonProps {
@@ -7,11 +6,12 @@ interface AddRowButtonProps {
 
 export function AddRowButton({ onClick }: AddRowButtonProps) {
   return (
-    <div className="px-4 py-3 border-t">
-      <Button variant="ghost" size="sm" className="text-xs text-muted-foreground" onClick={onClick}>
-        <Plus className="h-3.5 w-3.5 mr-1" />
-        Add Another
-      </Button>
-    </div>
+    <button
+      onClick={onClick}
+      className="flex w-full items-center justify-center gap-1.5 rounded-[9px] border border-dashed border-border bg-transparent px-3 py-2.5 text-xs text-muted transition-colors hover:bg-panel/40"
+    >
+      <Plus className="h-3.5 w-3.5" />
+      Add key
+    </button>
   );
 }
