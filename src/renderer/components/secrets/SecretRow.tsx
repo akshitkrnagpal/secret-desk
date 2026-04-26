@@ -1,57 +1,110 @@
 import { useState } from 'react';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Eye, EyeOff, Trash2 } from 'lucide-react';
+import { Eye, EyeOff, Copy, Trash2 } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { toast } from 'sonner';
 import type { SecretEntry } from '../../../shared/types';
 
 interface SecretRowProps {
   entry: SecretEntry;
-  index: number;
+  edited: boolean;
   onChange: (entry: SecretEntry) => void;
   onRemove: () => void;
 }
 
-export function SecretRow({ entry, onChange, onRemove }: SecretRowProps) {
+export function SecretRow({ entry, edited, onChange, onRemove }: SecretRowProps) {
   const [visible, setVisible] = useState(false);
+  const isBinary = !!entry.isBinary;
+  const masked = '•'.repeat(Math.min(entry.value.length, 28));
+
+  const handleCopy = async () => {
+    if (isBinary) return;
+    try {
+      await navigator.clipboard.writeText(entry.value);
+      toast.success('Value copied');
+    } catch {
+      toast.error('Copy failed');
+    }
+  };
 
   return (
-    <div className="grid grid-cols-[1fr_1fr_auto_auto] gap-2 items-center px-4 py-2">
-      <Input
-        value={entry.key}
-        onChange={(e) => onChange({ ...entry, key: e.target.value })}
-        placeholder="KEY_NAME"
-        className="font-mono text-xs h-8"
-      />
-      {entry.isBinary ? (
-        <div className="flex items-center h-8 px-3 text-xs text-muted-foreground bg-muted rounded-md border">
-          [Binary data]
+    <div
+      className={cn(
+        'relative mb-2 rounded-[9px] border bg-panel px-3.5 py-3',
+        edited ? 'border-accent-line' : 'border-border',
+      )}
+    >
+      {edited && (
+        <span className="absolute top-3 bottom-3 left-[-1px] w-[2px] rounded-[1px] bg-accent" />
+      )}
+      <div className="mb-1.5 flex items-center justify-between">
+        <div className="flex items-center gap-1.5 min-w-0 flex-1">
+          <input
+            value={entry.key}
+            onChange={(e) => onChange({ ...entry, key: e.target.value })}
+            placeholder="KEY_NAME"
+            className="min-w-0 flex-1 bg-transparent font-mono text-[11.5px] font-semibold text-foreground placeholder:text-faint focus:outline-none"
+          />
+          {edited && (
+            <span className="shrink-0 rounded-[3px] bg-accent-soft px-1.5 py-px font-mono text-[9.5px] font-medium text-accent">
+              EDITED
+            </span>
+          )}
+          {isBinary && (
+            <span className="shrink-0 rounded-[3px] bg-foreground/10 px-1.5 py-px font-mono text-[9.5px] font-medium text-muted">
+              BINARY
+            </span>
+          )}
         </div>
-      ) : (
-        <Input
-          type={visible ? 'text' : 'password'}
+        <div className="flex shrink-0 items-center gap-0">
+          <span className="mr-2 font-mono text-[10px] text-faint">{entry.value.length}b</span>
+          {!isBinary && (
+            <button
+              onClick={() => setVisible((v) => !v)}
+              className="rounded p-1 text-muted hover:bg-panel-2"
+              title={visible ? 'Hide' : 'Show'}
+            >
+              {visible ? <EyeOff className="h-3 w-3" /> : <Eye className="h-3 w-3" />}
+            </button>
+          )}
+          {!isBinary && (
+            <button
+              onClick={handleCopy}
+              className="rounded p-1 text-muted hover:bg-panel-2"
+              title="Copy"
+            >
+              <Copy className="h-3 w-3" />
+            </button>
+          )}
+          <button
+            onClick={onRemove}
+            className="rounded p-1 text-muted hover:bg-panel-2 hover:text-danger"
+            title="Delete"
+          >
+            <Trash2 className="h-3 w-3" />
+          </button>
+        </div>
+      </div>
+
+      {isBinary ? (
+        <div className="rounded-md border border-border-soft bg-input px-2.5 py-1.5 font-mono text-xs italic text-muted">
+          [Binary data · {entry.value.length} bytes · cannot edit inline]
+        </div>
+      ) : visible ? (
+        <textarea
           value={entry.value}
           onChange={(e) => onChange({ ...entry, value: e.target.value })}
           placeholder="value"
-          className="font-mono text-xs h-8"
+          rows={1}
+          className="block w-full resize-y rounded-md border border-border-soft bg-input px-2.5 py-1.5 font-mono text-xs text-foreground placeholder:text-faint focus:border-border focus:outline-none"
         />
+      ) : (
+        <div
+          onClick={() => setVisible(true)}
+          className="cursor-text overflow-hidden truncate whitespace-nowrap rounded-md border border-border-soft bg-input px-2.5 py-1.5 font-mono text-xs text-faint"
+        >
+          {masked}
+        </div>
       )}
-      <Button
-        variant="ghost"
-        size="icon"
-        className="h-8 w-8"
-        onClick={() => setVisible(!visible)}
-        disabled={entry.isBinary}
-      >
-        {visible ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
-      </Button>
-      <Button
-        variant="ghost"
-        size="icon"
-        className="h-8 w-8 text-muted-foreground hover:text-destructive"
-        onClick={onRemove}
-      >
-        <Trash2 className="h-3.5 w-3.5" />
-      </Button>
     </div>
   );
 }

@@ -7,10 +7,12 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Button } from '@/components/ui/button';
 import { ConfirmDialog } from '@/components/common/ConfirmDialog';
+import { IconMark } from './IconMark';
 import { cn } from '@/lib/utils';
-import { Loader2, FolderOpen, AlertTriangle, RefreshCw, ChevronDown, Check, Trash2 } from 'lucide-react';
+import { Loader2, AlertTriangle, RefreshCw, ChevronDown, Check, Trash2 } from 'lucide-react';
+
+const APP_VERSION = '1.0.0';
 
 export function Sidebar() {
   const { state, dispatch, retry, deleteContext } = useAppContext();
@@ -31,36 +33,60 @@ export function Sidebar() {
     setDeleteTarget(null);
   };
 
+  const isOnline = state.currentContext && !state.error;
+
   return (
-    <aside className="w-56 shrink-0 bg-sidebar text-sidebar-foreground">
-      <div className="h-12 app-drag-region" />
-      <div className="px-3 py-3 no-drag">
+    <aside className="flex w-50 shrink-0 flex-col border-r border-border bg-sidebar text-sidebar-foreground">
+      <div className="h-10 px-3.5 pt-3 app-drag-region" />
+
+      <div className="px-3.5 pt-3.5 pb-2.5 no-drag">
+        <div className="mb-3.5 flex items-center gap-2.5">
+          <IconMark size={22} />
+          <span className="font-display text-sm font-semibold tracking-[-0.01em] text-foreground">
+            SecretDesk
+          </span>
+        </div>
+
         {state.contexts.length > 0 ? (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="w-full h-8 justify-between text-xs font-normal">
-                <span className="truncate">{state.currentContext || 'Select context'}</span>
+              <button className="flex w-full items-center justify-between rounded-md border border-border bg-panel px-2.5 py-1.5 text-left text-foreground transition-colors hover:bg-panel-2">
+                <span className="flex items-center gap-2">
+                  <span
+                    className="h-1.5 w-1.5 rounded-full"
+                    style={{ background: isOnline ? 'var(--color-ok)' : 'var(--color-danger)' }}
+                  />
+                  <span className="font-mono text-[11.5px] truncate max-w-[120px]">
+                    {state.currentContext || 'Select context'}
+                  </span>
+                </span>
                 <ChevronDown className="h-3 w-3 shrink-0 opacity-50" />
-              </Button>
+              </button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="start" className="min-w-[var(--radix-dropdown-menu-trigger-width)] max-w-96">
+            <DropdownMenuContent
+              align="start"
+              className="min-w-[var(--radix-dropdown-menu-trigger-width)] max-w-96"
+            >
               {state.contexts.map((ctx) => (
                 <DropdownMenuItem
                   key={ctx.name}
                   className="flex items-center justify-between gap-2 text-xs"
                   onSelect={() => {
-                    if (ctx.name !== state.currentContext) {
-                      handleContextSwitch(ctx.name);
-                    }
+                    if (ctx.name !== state.currentContext) handleContextSwitch(ctx.name);
                   }}
                 >
-                  <div className="flex items-center gap-2 min-w-0">
-                    <Check className={cn('h-3 w-3 shrink-0', ctx.name !== state.currentContext && 'invisible')} />
-                    <span>{ctx.name}</span>
+                  <div className="flex min-w-0 items-center gap-2">
+                    <Check
+                      className={cn(
+                        'h-3 w-3 shrink-0',
+                        ctx.name !== state.currentContext && 'invisible',
+                      )}
+                    />
+                    <span className="font-mono">{ctx.name}</span>
                   </div>
                   {state.contexts.length > 1 && (
                     <button
-                      className="shrink-0 rounded p-0.5 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+                      className="shrink-0 rounded p-0.5 text-muted hover:bg-accent-soft hover:text-accent"
                       onClick={(e) => {
                         e.stopPropagation();
                         setDeleteTarget(ctx.name);
@@ -74,61 +100,81 @@ export function Sidebar() {
             </DropdownMenuContent>
           </DropdownMenu>
         ) : state.loading.contexts ? (
-          <div className="flex items-center gap-2 text-xs text-muted-foreground h-8">
+          <div className="flex h-8 items-center gap-2 text-xs text-muted">
             <Loader2 className="h-3 w-3 animate-spin" />
-            Loading contexts...
+            Loading contexts…
           </div>
         ) : (
-          <div className="text-xs text-muted-foreground h-8 flex items-center">
-            No contexts found
-          </div>
+          <div className="flex h-8 items-center text-xs text-muted">No contexts found</div>
         )}
       </div>
-      <div className="flex h-10 items-center px-4 text-xs font-medium text-muted-foreground uppercase tracking-wider">
-        Namespaces
+
+      <div className="px-2 pt-2 pb-1.5 font-sans text-[10px] font-semibold uppercase tracking-[0.08em] text-faint">
+        <span className="px-2">Namespaces</span>
       </div>
-      <ScrollArea className="h-[calc(100vh-10rem)]">
+
+      <ScrollArea className="flex-1 px-2">
         {state.loading.namespaces ? (
           <div className="flex items-center justify-center py-8">
-            <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+            <Loader2 className="h-4 w-4 animate-spin text-muted" />
           </div>
         ) : state.error && state.namespaces.length === 0 ? (
-          <div className="flex flex-col items-center gap-3 px-4 py-8 text-center">
-            <AlertTriangle className="h-5 w-5 text-destructive opacity-60" />
-            <p className="text-xs text-muted-foreground">Failed to connect</p>
-            <Button variant="outline" size="sm" className="h-7 text-xs" onClick={retry}>
-              <RefreshCw className="h-3 w-3 mr-1" />
+          <div className="flex flex-col items-center gap-3 px-2 py-8 text-center">
+            <AlertTriangle className="h-5 w-5 text-danger opacity-60" />
+            <p className="text-xs text-muted">Failed to connect</p>
+            <button
+              className="inline-flex h-7 items-center gap-1 rounded-md border border-border bg-panel px-2.5 text-xs text-foreground transition-colors hover:bg-panel-2"
+              onClick={retry}
+            >
+              <RefreshCw className="h-3 w-3" />
               Retry
-            </Button>
+            </button>
           </div>
         ) : state.namespaces.length === 0 ? (
-          <div className="px-4 py-8 text-center text-xs text-muted-foreground">
+          <div className="px-2 py-8 text-center text-xs text-muted">
             {state.currentContext ? 'No namespaces found' : 'Select a context'}
           </div>
         ) : (
-          <nav className="space-y-0.5 px-2">
-            {state.namespaces.map((ns) => (
-              <button
-                key={ns}
-                onClick={() => {
-                  dispatch({ type: 'SET_SELECTED_NAMESPACE', namespace: ns });
-                }}
-                className={cn(
-                  'flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm transition-colors hover:bg-accent',
-                  state.selectedNamespace === ns && 'bg-accent text-accent-foreground font-medium',
-                )}
-              >
-                <FolderOpen className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
-                <span className="truncate">{ns}</span>
-              </button>
-            ))}
+          <nav className="space-y-px">
+            {state.namespaces.map((ns) => {
+              const active = state.selectedNamespace === ns;
+              return (
+                <button
+                  key={ns}
+                  onClick={() => dispatch({ type: 'SET_SELECTED_NAMESPACE', namespace: ns })}
+                  className={cn(
+                    'flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-[12.5px] transition-colors',
+                    active
+                      ? 'bg-accent-soft font-medium text-foreground'
+                      : 'text-foreground/85 hover:bg-panel-2',
+                  )}
+                >
+                  <span
+                    className="h-[5px] w-[5px] shrink-0 rounded-[1.5px]"
+                    style={{
+                      background: active ? 'var(--color-accent)' : 'var(--color-faint)',
+                    }}
+                  />
+                  <span className="truncate">{ns}</span>
+                </button>
+              );
+            })}
           </nav>
         )}
       </ScrollArea>
 
+      <div className="flex items-center justify-between border-t border-border-soft px-3.5 py-3 font-sans text-[11px] text-faint">
+        <span style={{ color: isOnline ? 'var(--color-ok)' : 'var(--color-danger)' }}>
+          ● {isOnline ? 'online' : 'offline'}
+        </span>
+        <span className="font-mono">{APP_VERSION}</span>
+      </div>
+
       <ConfirmDialog
         open={deleteTarget !== null}
-        onOpenChange={(open) => { if (!open) setDeleteTarget(null); }}
+        onOpenChange={(open) => {
+          if (!open) setDeleteTarget(null);
+        }}
         title="Delete context"
         description={`Are you sure you want to delete "${deleteTarget}"? This will remove the context and any orphaned cluster/user entries from your kubeconfig.`}
         onConfirm={handleDeleteConfirm}
