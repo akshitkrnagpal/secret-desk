@@ -63,7 +63,7 @@ const config: ForgeConfig = {
   publishers: [
     new PublisherGithub({
       repository: { owner: 'akshitkrnagpal', name: 'secret-desk' },
-      prerelease: true,
+      prerelease: false,
       draft: false,
     }),
   ],
