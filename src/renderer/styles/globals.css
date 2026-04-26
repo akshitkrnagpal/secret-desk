@@ -2,12 +2,23 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/*
+  SecretDesk · Pane theme — locked tokens
+  Direction: Pane · Accent: Ink · Density: Comfy · Layout: Row · Icon: Variant C
+
+  ⚠️ Ink accent inverts between modes:
+     - Light: #1F1F1F (near-black) on light surfaces
+     - Dark:  #EDEAE3 (near-white) on dark surfaces
+     This keeps primary buttons / selection / focus rings legible in both.
+     The *-foreground value also inverts so button text contrasts correctly.
+*/
+
 @theme {
   --font-sans: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
   --font-display: "Inter Tight", "Inter", -apple-system, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
 
-  /* Pane theme tokens */
+  /* Surfaces */
   --color-background: #FCFCFA;
   --color-foreground: #15130F;
   --color-panel: #FFFFFF;
@@ -20,29 +31,34 @@
   --color-muted: rgba(21, 19, 15, 0.58);
   --color-faint: rgba(21, 19, 15, 0.36);
 
-  --color-accent: #C05037;
-  --color-accent-soft: rgba(192, 80, 55, 0.10);
-  --color-accent-line: rgba(192, 80, 55, 0.24);
-  --color-accent-foreground: #FFFFFF;
+  /* Accent — Ink, light mode */
+  --color-accent: #1F1F1F;
+  --color-accent-soft: rgba(31, 31, 31, 0.08);
+  --color-accent-line: rgba(31, 31, 31, 0.20);
+  --color-accent-foreground: #FCFCFA;
 
   --color-ok: #4F7A5F;
   --color-warn: #9A7A1F;
   --color-danger: #A8443A;
 
-  /* Compatibility tokens for shadcn/ui primitives */
+  /* shadcn/ui compatibility */
   --color-card: #FFFFFF;
   --color-card-foreground: #15130F;
   --color-popover: #FFFFFF;
   --color-popover-foreground: #15130F;
-  --color-primary: #C05037;
-  --color-primary-foreground: #FFFFFF;
+  --color-primary: #1F1F1F;
+  --color-primary-foreground: #FCFCFA;
   --color-secondary: #F6F5F2;
   --color-secondary-foreground: #15130F;
   --color-muted-foreground: rgba(21, 19, 15, 0.58);
-  --color-accent-foreground-default: #FFFFFF;
   --color-destructive: #A8443A;
   --color-destructive-foreground: #FFFFFF;
-  --color-ring: rgba(192, 80, 55, 0.40);
+  --color-ring: rgba(31, 31, 31, 0.40);
+
+  /* Comfy density spacing — applied via component classes */
+  --space-row: 12px;
+  --space-card: 14px;
+  --space-side: 36px;
 
   --radius-sm: 4px;
   --radius-md: 6px;
@@ -63,8 +79,11 @@
   --color-muted: rgba(237, 234, 227, 0.60);
   --color-faint: rgba(237, 234, 227, 0.36);
 
-  --color-accent-soft: rgba(192, 80, 55, 0.16);
-  --color-accent-line: rgba(192, 80, 55, 0.32);
+  /* Accent inverts on dark */
+  --color-accent: #EDEAE3;
+  --color-accent-soft: rgba(237, 234, 227, 0.10);
+  --color-accent-line: rgba(237, 234, 227, 0.22);
+  --color-accent-foreground: #101014;
 
   --color-ok: #88C29C;
   --color-warn: #E5C77A;
@@ -74,11 +93,14 @@
   --color-card-foreground: #EDEAE3;
   --color-popover: #16161B;
   --color-popover-foreground: #EDEAE3;
+  --color-primary: #EDEAE3;
+  --color-primary-foreground: #101014;
   --color-secondary: #1B1B22;
   --color-secondary-foreground: #EDEAE3;
   --color-muted-foreground: rgba(237, 234, 227, 0.60);
   --color-destructive: #E07A6E;
   --color-destructive-foreground: #101014;
+  --color-ring: rgba(237, 234, 227, 0.32);
 }
 
 @layer base {
@@ -89,10 +111,5 @@
   }
 }
 
-.app-drag-region {
-  -webkit-app-region: drag;
-}
-
-.no-drag {
-  -webkit-app-region: no-drag;
-}
+.app-drag-region { -webkit-app-region: drag; }
+.no-drag { -webkit-app-region: no-drag; }

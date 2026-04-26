@@ -156,7 +156,7 @@ export function SecretEditor() {
       </div>
 
       <ScrollArea className="flex-1">
-        <div className="px-9 py-4.5">
+        <div className="px-9 py-3">
           {editEntries.map((entry, index) => (
             <SecretRow
               key={index}
