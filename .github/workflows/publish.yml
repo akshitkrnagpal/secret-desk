@@ -10,12 +10,8 @@ permissions:
 
 jobs:
   publish:
-    runs-on: ${{ matrix.os }}
+    runs-on: macos-latest
     environment: SecretDesk
-    strategy:
-      matrix:
-        os: [macos-latest]
-        arch: [x64, arm64]
 
     steps:
       - uses: actions/checkout@v4
@@ -39,7 +35,7 @@ jobs:
           p12-password: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
 
       - name: Publish
-        run: pnpm run publish -- --arch=${{ matrix.arch }}
+        run: pnpm run publish
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           APPLE_ID: ${{ secrets.APPLE_ID }}
